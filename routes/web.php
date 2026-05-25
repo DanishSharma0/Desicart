@@ -11,6 +11,8 @@ use App\Http\Controllers\Admin\AdminProductController;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminCouponController;
+use App\Http\Controllers\Shopkeeper\ShopkeeperDashboardController;
+use App\Http\Controllers\Shopkeeper\ShopkeeperProductController;
 use Illuminate\Support\Facades\Route;
 
 // Guest / Public Routes
@@ -20,6 +22,7 @@ Route::get('/contact', [HomeController::class, 'contact'])->name('contact');
 
 // Product Catalog
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+Route::get('/deals', [ProductController::class, 'deals'])->name('products.deals');
 Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
 Route::post('/products/{id}/review', [ProductController::class, 'storeReview'])
     ->middleware(['auth'])->name('products.review');
@@ -80,6 +83,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/orders/{id}', [AdminOrderController::class, 'show'])->name('orders.show');
     Route::patch('/orders/{id}/status', [AdminOrderController::class, 'updateStatus'])->name('orders.update-status');
     Route::patch('/orders/{id}/payment', [AdminOrderController::class, 'updatePaymentStatus'])->name('orders.update-payment');
+});
+
+// Shopkeeper Panel (Protected by Auth and Shopkeeper Role)
+Route::middleware(['auth', 'role:shopkeeper'])->prefix('shopkeeper')->name('shopkeeper.')->group(function () {
+    Route::get('/', [ShopkeeperDashboardController::class, 'index'])->name('dashboard');
+    Route::resource('products', ShopkeeperProductController::class);
 });
 
 require __DIR__.'/auth.php';

@@ -21,7 +21,8 @@ class Product extends Model
         'rating',
         'stock',
         'brand_id',
-        'category_id'
+        'category_id',
+        'shopkeeper_id'
     ];
 
     protected $casts = [
@@ -39,6 +40,11 @@ class Product extends Model
     public function brand(): BelongsTo
     {
         return $this->belongsTo(Brand::class);
+    }
+
+    public function shopkeeper(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'shopkeeper_id');
     }
 
     public function images(): HasMany

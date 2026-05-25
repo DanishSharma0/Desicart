@@ -47,9 +47,11 @@
                 <!-- Navigation Actions Section -->
                 <div class="flex items-center gap-4">
                     <!-- Wishlist (Desktop) -->
+                    @if(!Auth::check() || !Auth::user()->hasRole('shopkeeper'))
                     <a href="{{ route('dashboard.wishlist') }}" class="hidden sm:flex items-center justify-center w-10 h-10 rounded-full border border-slate-100 hover:border-rose-100 hover:bg-rose-50/50 text-slate-600 hover:text-rose-600 transition-all duration-300 shadow-premium-sm">
                         <i class="fa-regular fa-heart text-sm"></i>
                     </a>
+                    @endif
 
                     <!-- User Profile / Auth Actions -->
                     @auth
@@ -69,7 +71,13 @@
                                     <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Account</p>
                                     <p class="text-sm font-bold text-slate-800 truncate">{{ Auth::user()->name }}</p>
                                 </div>
-                                <a href="{{ route('dashboard') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-emerald-600 transition-colors"><i class="fa-solid fa-chart-line text-[14px]"></i> Dashboard</a>
+                                @if(Auth::user()->hasRole('shopkeeper'))
+                                    <a href="{{ route('shopkeeper.dashboard') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-emerald-600 transition-colors"><i class="fa-solid fa-chart-line text-[14px]"></i> Dashboard</a>
+                                @elseif(Auth::user()->hasRole('admin'))
+                                    <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-emerald-600 transition-colors"><i class="fa-solid fa-chart-line text-[14px]"></i> Dashboard</a>
+                                @else
+                                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-emerald-600 transition-colors"><i class="fa-solid fa-chart-line text-[14px]"></i> Dashboard</a>
+                                @endif
                                 <a href="{{ route('profile.edit') }}" class="flex items-center gap-2 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-emerald-600 transition-colors"><i class="fa-solid fa-cog text-[14px]"></i> Settings</a>
                                 <div class="h-px bg-slate-50 my-1"></div>
                                 <form method="POST" action="{{ route('logout') }}">
@@ -83,6 +91,7 @@
                     @endauth
 
                     <!-- Cart Button -->
+                    @if(!Auth::check() || !Auth::user()->hasRole('shopkeeper'))
                     <a href="{{ route('cart.index') }}" class="relative flex items-center gap-2 border border-slate-200 bg-white/95 text-slate-900 px-4 py-2.5 rounded-full transition-all duration-300 transform hover:-translate-y-0.5 shadow-soft-glow cart-glow-btn">
                         <i class="fa-solid fa-bag-shopping text-sm"></i>
                         <span class="hidden md:inline text-xs font-black tracking-wide uppercase">DesiCart</span>
@@ -100,6 +109,7 @@
                             <span class="flex items-center justify-center min-w-5 h-5 bg-orange-500 border-2 border-emerald-600 text-[10px] font-bold text-white rounded-full px-1 shadow-premium-sm">{{ $cartItemCount }}</span>
                         @endif
                     </a>
+                    @endif
                 </div>
             </div>
         </nav>
@@ -117,7 +127,8 @@
             <div class="w-px h-5 bg-slate-200/80 flex-shrink-0"></div>
 
             @php
-                $isAllActive = !request('category');
+                $isDealsActive = request()->routeIs('products.deals');
+                $isAllActive = !request('category') && !$isDealsActive;
             @endphp
             <a href="{{ route('products.index') }}"
                class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold transition-all duration-300 whitespace-nowrap hover:-translate-y-0.5
@@ -129,6 +140,18 @@
                     <i class="fa-solid fa-border-all"></i>
                 </span>
                 <span>All</span>
+            </a>
+
+            <a href="{{ route('products.deals') }}"
+               class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border text-xs font-bold transition-all duration-300 whitespace-nowrap hover:-translate-y-0.5
+               {{ $isDealsActive
+                  ? 'bg-gradient-premium border-emerald-600 text-white shadow-sm'
+                  : 'bg-amber-50 border-amber-200/60 text-amber-700 hover:border-amber-400 hover:text-amber-800 hover:bg-amber-100/50'
+               }}">
+                <span class="flex items-center justify-center w-4 h-4 rounded-full {{ $isDealsActive ? 'bg-white/25 text-white' : 'text-amber-600 bg-white' }} text-[8px]">
+                    <i class="fa-solid fa-bolt"></i>
+                </span>
+                <span>Deals</span>
             </a>
 
             @foreach($categories as $category)

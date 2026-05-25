@@ -81,4 +81,22 @@ class ProductController extends Controller
 
         return redirect()->back()->with('success', 'Thank you for your review!');
     }
+
+    public function deals(Request $request)
+    {
+        $filters = $request->only(['search', 'category', 'brand', 'min_price', 'max_price', 'rating', 'sort']);
+        $filters['is_deal'] = true;
+        
+        $products = $this->productService->getFilteredProducts($filters, 12);
+        
+        $categories = Category::withCount('products')->get();
+        $brands = Brand::withCount('products')->get();
+
+        return view('products.deals', [
+            'products' => $products,
+            'categories' => $categories,
+            'brands' => $brands,
+            'filters' => $filters
+        ]);
+    }
 }

@@ -1,6 +1,21 @@
 <x-app-layout>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
+        <!-- Banner Section -->
+        <div class="bg-gradient-to-r from-emerald-600 to-teal-500 rounded-3xl p-8 shadow-lg mb-8 text-white relative overflow-hidden">
+            <div class="absolute -right-20 -top-20 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+            <div class="absolute -left-10 -bottom-10 w-48 h-48 bg-emerald-900/20 rounded-full blur-2xl"></div>
+            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between">
+                <div class="mb-6 md:mb-0 max-w-xl">
+                    <h1 class="text-3xl md:text-4xl font-extrabold mb-4">Exclusive Deals & Offers! 🛍️</h1>
+                    <p class="text-emerald-50 text-lg">Shop smarter and save more. Discover handpicked, competitive offers on your favorite groceries. Don't miss out on these limited-time savings!</p>
+                </div>
+                <div class="flex-shrink-0">
+                    <i class="fa-solid fa-tags text-7xl text-emerald-200/50 transform rotate-12"></i>
+                </div>
+            </div>
+        </div>
+
         <div class="flex flex-col lg:flex-row gap-8">
             
             <!-- Sidebar Filters -->
@@ -8,12 +23,12 @@
                 <div class="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm sticky top-24">
                     <h2 class="text-lg font-bold text-slate-900 mb-6 flex items-center justify-between">
                         <span>Filters</span>
-                        @if(count($filters) > 0)
-                            <a href="{{ route('products.index') }}" class="text-xs font-semibold text-emerald-600 hover:text-emerald-700">Clear All</a>
+                        @if(count($filters) > 1)
+                            <a href="{{ route('products.deals') }}" class="text-xs font-semibold text-emerald-600 hover:text-emerald-700">Clear All</a>
                         @endif
                     </h2>
 
-                    <form action="{{ route('products.index') }}" method="GET" class="space-y-6">
+                    <form action="{{ route('products.deals') }}" method="GET" class="space-y-6">
                         
                         <!-- Search (if hidden on navbar) -->
                         <div class="block md:hidden">
@@ -87,7 +102,7 @@
                             </div>
                         </div>
 
-                        <!-- Submit Buttons (for inputs like min/max price that don't trigger submit instantly) -->
+                        <!-- Submit Buttons -->
                         <button type="submit" class="w-full bg-slate-900 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition-colors duration-200">
                             Apply Filters
                         </button>
@@ -102,22 +117,21 @@
                 <!-- Sort and Header Section -->
                 <div class="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm mb-8 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div>
-                        <h1 class="text-xl font-extrabold text-slate-900">Grocery Catalog</h1>
+                        <h2 class="text-xl font-extrabold text-slate-900">Active Deals</h2>
                         <p class="text-sm text-slate-500">Showing {{ $products->firstItem() ?? 0 }}-{{ $products->lastItem() ?? 0 }} of {{ $products->total() }} results</p>
                     </div>
 
                     <!-- Sorting -->
-                    <form action="{{ route('products.index') }}" method="GET" class="flex items-center space-x-2 w-full sm:w-auto">
-                        <!-- Keep other filter values as hidden fields -->
+                    <form action="{{ route('products.deals') }}" method="GET" class="flex items-center space-x-2 w-full sm:w-auto">
                         @foreach($filters as $k => $v)
-                            @if($k !== 'sort' && $v)
+                            @if($k !== 'sort' && $k !== 'is_deal' && $v)
                                 <input type="hidden" name="{{ $k }}" value="{{ $v }}" />
                             @endif
                         @endforeach
                         <label class="text-sm text-slate-500 whitespace-nowrap">Sort By:</label>
                         <select name="sort" onchange="this.form.submit()" 
                                 class="bg-slate-50 border-0 focus:ring-2 focus:ring-emerald-500/30 rounded-full text-sm text-slate-700 font-medium px-4 py-2 pr-8">
-                            <option value="latest" {{ (!isset($filters['sort']) || $filters['sort'] === 'latest') ? 'selected' : '' }}>Latest Arrivals</option>
+                            <option value="latest" {{ (!isset($filters['sort']) || $filters['sort'] === 'latest') ? 'selected' : '' }}>Latest Deals</option>
                             <option value="price_low" {{ (isset($filters['sort']) && $filters['sort'] === 'price_low') ? 'selected' : '' }}>Price: Low to High</option>
                             <option value="price_high" {{ (isset($filters['sort']) && $filters['sort'] === 'price_high') ? 'selected' : '' }}>Price: High to Low</option>
                             <option value="popularity" {{ (isset($filters['sort']) && $filters['sort'] === 'popularity') ? 'selected' : '' }}>Customer Rating</option>
@@ -157,7 +171,7 @@
                                             $saving = $product->price - $product->discount_price;
                                             $pct = round(($saving / $product->price) * 100);
                                         @endphp
-                                        <span class="bg-amber-400 text-slate-950 text-[10px] font-extrabold px-2.5 py-1 rounded-full">
+                                        <span class="bg-amber-400 text-slate-950 text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-md">
                                             Save {{ $pct }}%
                                         </span>
                                     </div>
@@ -190,12 +204,8 @@
 
                                     <!-- Price -->
                                     <div class="flex items-baseline space-x-2 mb-4">
-                                        @if($product->discount_price)
-                                            <span class="text-lg font-black text-emerald-600">${{ number_format($product->discount_price, 2) }}</span>
-                                            <span class="text-sm text-slate-400 line-through">${{ number_format($product->price, 2) }}</span>
-                                        @else
-                                            <span class="text-lg font-black text-slate-900">${{ number_format($product->price, 2) }}</span>
-                                        @endif
+                                        <span class="text-lg font-black text-emerald-600">${{ number_format($product->discount_price, 2) }}</span>
+                                        <span class="text-sm text-slate-400 line-through">${{ number_format($product->price, 2) }}</span>
                                     </div>
 
                                     <div class="mt-auto">
@@ -243,11 +253,11 @@
                     <!-- No Results -->
                     <div class="bg-white border border-slate-100 rounded-3xl p-16 text-center shadow-sm">
                         <div class="w-20 h-20 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-6">
-                            <i class="fa-solid fa-basket-shopping text-3xl"></i>
+                            <i class="fa-solid fa-tags text-3xl"></i>
                         </div>
-                        <h3 class="text-lg font-bold text-slate-900 mb-2">No Products Found</h3>
-                        <p class="text-slate-500 max-w-sm mx-auto mb-6">We couldn't find any products matching your selected filters. Try broadening your keywords or removing some limits.</p>
-                        <a href="{{ route('products.index') }}" class="bg-gradient-premium text-white font-semibold px-6 py-3 rounded-full text-sm shadow-md shadow-emerald-100 hover:opacity-90 transition-opacity">
+                        <h3 class="text-lg font-bold text-slate-900 mb-2">No Deals Currently Available</h3>
+                        <p class="text-slate-500 max-w-sm mx-auto mb-6">Check back later for exciting new offers and discounts on your favorite products.</p>
+                        <a href="{{ route('products.index') }}" class="bg-emerald-600 text-white font-semibold px-6 py-3 rounded-full text-sm shadow-md hover:bg-emerald-700 transition-colors">
                             View All Products
                         </a>
                     </div>

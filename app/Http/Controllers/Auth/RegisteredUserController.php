@@ -51,6 +51,10 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
+        if ($user->hasRole('shopkeeper')) {
+            return redirect(route('shopkeeper.dashboard', absolute: false));
+        }
+
         return redirect(route('dashboard', absolute: false));
     }
 }

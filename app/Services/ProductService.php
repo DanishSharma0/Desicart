@@ -59,6 +59,10 @@ class ProductService
             $query->where('rating', '>=', $filters['rating']);
         }
 
+        if (!empty($filters['is_deal'])) {
+            $query->whereNotNull('discount_price')->whereColumn('discount_price', '<', 'price');
+        }
+
         // Sorting
         $sort = $filters['sort'] ?? 'latest';
         switch ($sort) {
