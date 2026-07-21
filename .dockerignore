@@ -12,5 +12,4 @@ storage/logs
 tests
 .vscode
 .idea
-docker
 docker-compose.yml
