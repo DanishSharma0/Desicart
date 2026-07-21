@@ -50,7 +50,7 @@ COPY --from=vendor /var/www/html /var/www/html
 COPY --from=vendor /var/www/html/vendor /var/www/html/vendor
 
 # Copy built assets from node stage
-COPY --from=node_builder /app/dist /var/www/html/public/build
+COPY --from=node_builder /app/public/build /var/www/html/public/build
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
