@@ -16,8 +16,18 @@ fi
 # Storage link (safe) — migrations are run separately via Render job or manually
 php artisan storage:link || true
 
+# Ensure SQLite database exists and has correct permissions
+if [ "${DB_CONNECTION}" = "sqlite" ] || [ -z "${DB_CONNECTION}" ]; then
+  touch database/database.sqlite
+  chown www-data:www-data database/database.sqlite || true
+  chmod 664 database/database.sqlite || true
+fi
+
+# Run migrations automatically
+php artisan migrate --force
+
 # Ensure permissions
-chown -R www-data:www-data storage bootstrap/cache || true
+chown -R www-data:www-data storage bootstrap/cache database || true
 
 # Start php-fpm in background and nginx in foreground
 php-fpm -D || true
