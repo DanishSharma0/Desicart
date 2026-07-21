@@ -24,7 +24,7 @@ WORKDIR /var/www/html
 ## Production build stage: install PHP deps and build vendor
 FROM base AS vendor
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
 
 COPY . /var/www/html
 
