@@ -1,0 +1,37 @@
+# Render deployment configuration
+services:
+  - type: web
+    name: desicart-web
+    env: docker
+    region: oregon
+    plan: starter
+    dockerfilePath: Dockerfile
+
+# A job to run database migrations. You can run this manually from Render
+# Dashboard → Jobs → desicart-migrate after deploying, or run the command
+# in the service Shell.
+jobs:
+  - type: job
+    name: desicart-migrate
+    env: docker
+    dockerfilePath: Dockerfile
+    plan: starter
+    command: php artisan migrate --force
+
+# Example database (optional) - create via Render dashboard or uncomment and adjust
+# databases:
+#  - name: desicart-db
+#    engine: postgresql15
+#    plan: starter
+
+# After deploying, set these environment variables in Render dashboard:
+# APP_ENV=production
+# APP_KEY= (generate or let entrypoint generate)
+# APP_URL=https://your-service.onrender.com
+# DB_CONNECTION=mysql|pgsql
+# DB_HOST= (if using managed DB)
+# DB_PORT=
+# DB_DATABASE=
+# DB_USERNAME=
+# DB_PASSWORD=
+# FILESYSTEM_DISK=s3 (if using S3)

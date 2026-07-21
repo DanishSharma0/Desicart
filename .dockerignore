@@ -1,0 +1,16 @@
+.git
+vendor
+node_modules
+.env
+.env.local
+storage/*.key
+storage/app
+storage/framework/cache/data
+storage/framework/sessions
+storage/framework/views
+storage/logs
+tests
+.vscode
+.idea
+docker
+docker-compose.yml
